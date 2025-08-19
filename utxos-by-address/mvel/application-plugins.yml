@@ -1,0 +1,27 @@
+store:
+  plugins:
+    enabled: true
+    exit-on-error: true
+
+    filters:
+      utxo.unspent.save:
+        - name: Filter by address
+          lang: mvel
+          script: 
+            file: /app/plugins/scripts/utxo.mvel
+            function: filterByAddress
+
+    event-handlers:
+      CommitEvent:
+        - name: "Delete additional tx inputs"
+          lang: mvel
+          script: 
+            file: /app/plugins/scripts/utxo.mvel
+            function: handleCommitEvent
+
+        - name: "Send Balance Change Notification"
+          lang: mvel
+          script: 
+            file: /app/plugins/scripts/utxo.mvel
+            function: sendDiscordNotificationOnBalanceChange
+    
