@@ -31,7 +31,7 @@ def handleCommitEvent(event):
     """
     Handles commit events by cleaning up additional transaction inputs
     
-    APPROACH: Since tx_input records don't have address filtering and Yaci Store processes 
+    Since tx_input records don't have address filtering and Yaci Store processes 
     blocks in parallel batches (100 blocks during initial sync, 1 block at tip), tx_input 
     records may be inserted before their corresponding UTXO entries in address_utxo table. 
     The CommitEvent is published at the end of each batch and handlers are processed 
@@ -40,8 +40,8 @@ def handleCommitEvent(event):
     Args:
         event: The commit event containing metadata like slot number
     """
-    # Get the last processed slot from state, default to 0 if not set
-    last_tx_inputs_slot = state.get("last_tx_inputs_slot")
+    # Get the last processed slot from global_state, default to 0 if not set
+    last_tx_inputs_slot = global_state.get("last_tx_inputs_slot")
     if last_tx_inputs_slot is None:
         last_tx_inputs_slot = 0
 
@@ -68,7 +68,11 @@ def handleCommitEvent(event):
         print(f"Deleted {count} additional tx inputs.")
 
     # Update the last processed slot to current event slot
-    state.put("last_tx_inputs_slot", event.getMetadata().getSlot())
+    global_state.put("last_tx_inputs_slot", event.getMetadata().getSlot())
+
+def handleRollbackEvent(event):
+    # Reset last_tx_input_slot used in CommitEvent to delete additional tx inputs
+    global_state.put("last_tx_inputs_slot", event.getRollbackTo().getSlot())
 
 
 def sendDiscordNotificationOnBalanceChange(event):
@@ -102,7 +106,7 @@ def sendDiscordNotificationOnBalanceChange(event):
         discord_url = env.getProperty("discord.webhook.url")
 
         json_data = {
-            "content": f"💰 Unspent UTXO Balance: {balance} Lovelace at Block: {event.getMetadata().getBlock()}\n Address: addr_test1wppg9l6relcpls4u667twqyggkrpfrs5cdge9hhl9cv2upchtch0h"
+            "content": f"💰 Unspent UTXO Balance: {balance} Lovelace at Block: {event.getMetadata().getBlock()}\n Address: {address}"
         }
         
         response = http.postJson(discord_url, json_data, {"Content-Type": "application/json"})

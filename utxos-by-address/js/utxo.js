@@ -37,8 +37,8 @@ function filterByAddress(items) {
  * @param {Object} event - The commit event containing metadata like slot number
  */
 function handleCommitEvent(event) {
-    // Get the last processed slot from state, default to 0 if not set
-    let last_tx_inputs_slot = state.get("last_tx_inputs_slot");
+    // Get the last processed slot from global_state, default to 0 if not set
+    let last_tx_inputs_slot = global_state.get("last_tx_inputs_slot");
     if (last_tx_inputs_slot === null || last_tx_inputs_slot === undefined) {
         last_tx_inputs_slot = 0;
     }
@@ -67,7 +67,13 @@ function handleCommitEvent(event) {
     }
 
     // Update the last processed slot to current event slot
-    state.put("last_tx_inputs_slot", event.getMetadata().getSlot());
+    global_state.put("last_tx_inputs_slot", event.getMetadata().getSlot());
+}
+
+function handleRollbackEvent(event) {
+    //Reset last_tx_input_slot used in CommitEvent to delete additional tx inputs
+    console.log("Utxo by address plugin handleRollbackEvent: " + event.getRollbackTo().getSlot());
+    global_state.put("last_tx_inputs_slot", event.getRollbackTo().getSlot());
 }
 
 /**

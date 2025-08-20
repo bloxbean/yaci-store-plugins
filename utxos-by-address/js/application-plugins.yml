@@ -24,4 +24,11 @@ store:
           script: 
             file: /app/plugins/scripts/utxo.js
             function: sendDiscordNotificationOnBalanceChange
+
+      RollbackEvent:
+        - name: "Reset last_tx_input_slot"
+          lang: js
+          script: 
+            file: /app/plugins/scripts/utxo.js
+            function: handleRollbackEvent
     

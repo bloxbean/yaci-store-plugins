@@ -17,11 +17,16 @@ store:
           lang: mvel
           script: 
             file: /app/plugins/scripts/utxo.mvel
-            function: handleCommitEvent
-
+            function: handleCommitEvent          
         - name: "Send Balance Change Notification"
           lang: mvel
           script: 
             file: /app/plugins/scripts/utxo.mvel
             function: sendDiscordNotificationOnBalanceChange
-    
+            
+      RollbackEvent:
+        - name: "Reset last_tx_input_slot"
+          lang: mvel
+          script: 
+            file: /app/plugins/scripts/utxo.mvel
+            function: handleRollbackEvent
