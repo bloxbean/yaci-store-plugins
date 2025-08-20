@@ -28,7 +28,7 @@ To use any plugin from this repository:
 
 1. Clone or download this repo.
 2. Copy the plugin file you want into the `plugins/` folder of your Yaci Store distribution.
-3. Configure it in `application.properties` or `application.yml`:
+3. Configure it in `application.properties` and `application-plugins.yml`:
 
 ## 🧑‍💻 Contributing
 
